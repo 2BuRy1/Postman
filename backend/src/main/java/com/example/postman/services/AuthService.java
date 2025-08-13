@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.net.PasswordAuthentication;
+import java.util.Map;
 
 @Service
 public class AuthService {
@@ -23,16 +24,19 @@ public class AuthService {
 
     private final PasswordEncoder passwordEncoder;
 
-    public AuthService(BasicUserRepository basicUserRepository, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder) {
+    private final JwtService jwtService;
+
+    public AuthService(BasicUserRepository basicUserRepository, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, JwtService jwtService) {
         this.basicUserRepository = basicUserRepository;
         this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
 
 
 
-    public String register(BasicUser basicUser){
+    public Map<String, String> register(BasicUser basicUser){
 
         if(basicUserRepository.existsByUsername(basicUser.getUsername())) throw new BadCredentialsException("Username is already in use");
 
@@ -43,11 +47,11 @@ public class AuthService {
 
         System.out.println(basicUser.getPassword());
 
-            //TODO jwt service to get jwt token
 
             basicUserRepository.save(basicUser);
 
-        return "token-registration";
+        return Map.of("access", jwtService.createBaseAccessToken(basicUser.getUsername()), "refresh", jwtService.createBaseRefreshToken(basicUser.getUsername()));
+
 
 
 
@@ -55,9 +59,8 @@ public class AuthService {
     }
 
 
-    public String login(BasicUser basicUser){
+    public Map<String, String> login(BasicUser basicUser){
 
-        System.out.println("entered 1");
 
 
 
@@ -68,13 +71,13 @@ public class AuthService {
                         basicUser.getPassword()
                 )
         );
-        System.out.println("enetered 2");
 
 
         basicUserRepository.findBasicUserByUsername(basicUser.getUsername()).orElseThrow(() -> new UsernameNotFoundException("no user with such username"));
 
 
-        return "logged-token";
+
+        return Map.of("access", jwtService.createBaseAccessToken(basicUser.getUsername()), "refresh", jwtService.createBaseRefreshToken(basicUser.getUsername()));
     }
 
 }

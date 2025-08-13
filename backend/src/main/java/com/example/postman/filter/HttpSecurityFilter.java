@@ -36,7 +36,7 @@ public class HttpSecurityFilter {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .csrf(AbstractHttpConfigurer::disable)
                 .oauth2Client(Customizer.withDefaults())
-                .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("/auth-success", true))
+                .oauth2Login(oauth2 -> oauth2.loginPage("http://localhost:3000").defaultSuccessUrl("/auth-success", true))
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth

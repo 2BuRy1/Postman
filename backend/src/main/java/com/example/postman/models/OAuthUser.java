@@ -2,10 +2,14 @@ package com.example.postman.models;
 
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 @Data
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
 public class OAuthUser {
 
     @Id
@@ -16,7 +20,7 @@ public class OAuthUser {
     private String login;
 
     @Column(nullable = false, unique = true)
-    private Long providerId;
+    private String providerId;
 
     @Column(nullable = false)
     private String provider;
