@@ -44,7 +44,7 @@ public class AuthController {
 
 
     @Autowired
-    public AuthController(AuthService authService, BasicUserRepository basicUserRepository, JwtService jwtService) {
+    public AuthController(AuthService authService, JwtService jwtService) {
         this.authService = authService;
         this.jwtService = jwtService;
     }
@@ -59,14 +59,14 @@ public class AuthController {
 
         ResponseCookie authType = ResponseCookie.from("AUTH_TYPE", "base")
                 .httpOnly(false)
-                .secure(false) // для localhost
+                .secure(false)
                 .path("/")
                 .sameSite("Lax")
                 .build();
 
         ResponseCookie accessCookie = ResponseCookie.from("ACCESS_TOKEN", tokens.get("access"))
                 .httpOnly(false)
-                .secure(false) // для localhost
+                .secure(false)
                 .path("/")
                 .maxAge(60 * 15)
                 .sameSite("Lax")
@@ -74,15 +74,18 @@ public class AuthController {
 
         ResponseCookie refreshCookie = ResponseCookie.from("REFRESH_TOKEN", tokens.get("refresh"))
                 .httpOnly(true)
-                .secure(false) // для localhost
+                .secure(false)
                 .path("/auth")
                 .maxAge(60L * 60 * 24 * 30)
                 .sameSite("Lax")
                 .build();
 
-        response.addHeader("Set-Cookie", accessCookie.toString());
-        response.addHeader("Set-Cookie", refreshCookie.toString());
-        response.addHeader("Set-Cookie", authType.toString());
+
+
+
+        response.setHeader("Set-Cookie", accessCookie.toString());
+        response.setHeader("Set-Cookie", refreshCookie.toString());
+        response.setHeader("Set-Cookie", authType.toString());
 
         return ResponseEntity.ok(Map.of("status", "success"));
 

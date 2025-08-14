@@ -61,6 +61,7 @@ public class AuthService {
 
     public Map<String, String> login(BasicUser basicUser){
 
+        basicUserRepository.findBasicUserByUsername(basicUser.getUsername()).orElseThrow(() -> new UsernameNotFoundException("no user with such username"));
 
 
 
@@ -73,7 +74,6 @@ public class AuthService {
         );
 
 
-        basicUserRepository.findBasicUserByUsername(basicUser.getUsername()).orElseThrow(() -> new UsernameNotFoundException("no user with such username"));
 
 
 

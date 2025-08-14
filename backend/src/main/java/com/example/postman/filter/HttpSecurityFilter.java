@@ -12,13 +12,14 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
 @EnableMethodSecurity
 public class HttpSecurityFilter {
 
-
+    //private final JwtBaseFilter jwtBaseFilter;
 
     private final CorsConfigurationSource corsConfigurationSource;
 
@@ -26,6 +27,7 @@ public class HttpSecurityFilter {
 
     @Autowired
     public HttpSecurityFilter(CorsConfigurationSource corsConfigurationSource, AuthenticationProvider authenticationProvider) {
+      //  this.jwtBaseFilter = jwtBaseFilter;
         this.corsConfigurationSource = corsConfigurationSource;
         this.authenticationProvider = authenticationProvider;
     }
@@ -44,6 +46,7 @@ public class HttpSecurityFilter {
                         .requestMatchers("/form-login", "/login", "/form-register", "/form-registration").permitAll()
                         .anyRequest().authenticated()
                 ).authenticationProvider(authenticationProvider);
+              //  .addFilterBefore(jwtBaseFilter, UsernamePasswordAuthenticationFilter.class);
 
 
 
