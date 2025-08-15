@@ -1,24 +1,31 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {GithubOutlined, GoogleOutlined, LockOutlined, UserOutlined} from '@ant-design/icons';
 import { Button,  Form, Input} from 'antd';
 import AuthButton from "./AuthButton";
+import {useNavigate} from "react-router";
 
 
 
 const Register = () => {
+
+
+
+
+
+
     const onFinish = values => {
-        console.log('Received values of form: ', values);
         const data = {
             headers: {
                 'Content-Type': 'application/json'
             },
-                 'method' : 'POST',
+            'method' : 'POST',
+            'credentials': 'include',
             body:  JSON.stringify(values)
         }
 
-        fetch('http://localhost:8080/form-registration', data)
+        fetch('http://localhost:8080/form-register', data)
             .then(res => res.json()).then((res) => {
-                console.log(res);
+            console.log(res);
         })
     };
     return (

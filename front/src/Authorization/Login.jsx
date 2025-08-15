@@ -1,11 +1,38 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import '../styles/Login.css';
 import {GithubOutlined, GoogleOutlined, LockOutlined, UserOutlined} from '@ant-design/icons';
 import { Button, Checkbox, Form, Input, Flex } from 'antd';
 import AuthButton from "./AuthButton";
+import {useLocation, useNavigate} from "react-router";
 
 
 const Login = () => {
+
+    const navigate = useNavigate();
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+
+
+    const location = useLocation();
+    useEffect(() => {
+        const queryParams = new URLSearchParams(location.search);
+        const authenticated = queryParams.get('authenticated');
+        console.log("authenticvasadasd");
+        if (authenticated === 'true') {
+            setIsAuthenticated(true);
+        }
+    }, [location]);
+
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate('/');
+        }
+    }, [isAuthenticated, navigate]);
+
+
+
+
     const onFinish = values => {
         const data = {
             headers: {

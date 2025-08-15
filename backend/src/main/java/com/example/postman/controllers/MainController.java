@@ -12,7 +12,7 @@ public class MainController {
 
 
 
-    @PostMapping("/check_auth")
+    @GetMapping("/auth_check")
     public ResponseEntity<Map<String, String>> checkAuth(){
         System.out.println("got request");
         return ResponseEntity.ok(Map.of("auth", "success"));

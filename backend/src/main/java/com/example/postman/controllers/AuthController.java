@@ -31,7 +31,7 @@ import java.util.Map;
 public class AuthController {
 
 
-    private final String frontendUrl = "http://localhost:3000";
+    private final String frontendUrl = "http://localhost:3001";
 
 
     private boolean cookiesSecure = false;
@@ -168,6 +168,8 @@ public class AuthController {
             System.out.println(oAuthUser);
 
         }
+
+
         else{
             return (ResponseEntity<Void>) ResponseEntity.badRequest();
 
@@ -201,7 +203,7 @@ public class AuthController {
 
 
         return ResponseEntity.status(302)
-                .location(URI.create(frontendUrl))
+                .location(URI.create(frontendUrl + "/auth-success?authenticated=true"))
                 .build();
     }
 

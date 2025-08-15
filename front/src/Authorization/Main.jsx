@@ -9,13 +9,13 @@ const Main = () => {
             headers: {
                 'Content-Type': 'application/json'
             },
-            'method' : 'POST',
+            'method' : 'GET',
             'credentials': 'include',
         }
 
 
 
-        fetch("http://localhost:8080/lal", data).then((response) => {
+        fetch("http://localhost:8080/auth_check", data).then((response) => {
             console.log(response);
         })
 
