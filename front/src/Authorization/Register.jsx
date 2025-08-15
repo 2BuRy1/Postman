@@ -48,8 +48,10 @@ const Register = () => {
                         <Button block type="primary" htmlType="submit">
                             Register
                         </Button>
-
+                        Already have an account? <a href="/login">Login now!</a>
                     </Form.Item>
+
+
                 </Form>
             </div>
 

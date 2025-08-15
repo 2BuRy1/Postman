@@ -4,7 +4,18 @@ const Main = () => {
 
     useEffect(() => {
 
-        fetch("http://localhost:8080/lal").then((response) => {
+
+        const data = {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            'method' : 'POST',
+            'credentials': 'include',
+        }
+
+
+
+        fetch("http://localhost:8080/lal", data).then((response) => {
             console.log(response);
         })
 

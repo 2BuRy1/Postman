@@ -5,15 +5,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 public class MainController {
 
 
 
-    @PostMapping("/lal")
-    public ResponseEntity<String> lal(){
+    @PostMapping("/check_auth")
+    public ResponseEntity<Map<String, String>> checkAuth(){
         System.out.println("got request");
-        return ResponseEntity.ok("meow");
+        return ResponseEntity.ok(Map.of("auth", "success"));
     }
 
 

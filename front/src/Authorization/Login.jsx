@@ -12,6 +12,7 @@ const Login = () => {
                 'Content-Type': 'application/json'
             },
             'method' : 'POST',
+            'credentials': 'include',
             body:  JSON.stringify(values)
         }
 
@@ -58,7 +59,7 @@ const Login = () => {
                 <Button block type="primary" htmlType="submit">
                     Log in
                 </Button>
-                or <a href="">Register now!</a>
+                or <a href="/register">Register now!</a>
             </Form.Item>
         </Form>
         </div>
