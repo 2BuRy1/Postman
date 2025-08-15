@@ -58,14 +58,14 @@ public class AuthController {
         Map<String, String> tokens = authService.register(basicUser);
 
         ResponseCookie authType = ResponseCookie.from("AUTH_TYPE", "base")
-                .httpOnly(false)
+                .httpOnly(true)
                 .secure(false)
                 .path("/")
                 .sameSite("Lax")
                 .build();
 
         ResponseCookie accessCookie = ResponseCookie.from("ACCESS_TOKEN", tokens.get("access"))
-                .httpOnly(false)
+                .httpOnly(true)
                 .secure(false)
                 .path("/")
                 .maxAge(60 * 15)
@@ -75,7 +75,7 @@ public class AuthController {
         ResponseCookie refreshCookie = ResponseCookie.from("REFRESH_TOKEN", tokens.get("refresh"))
                 .httpOnly(true)
                 .secure(false)
-                .path("/auth")
+                .path("/")
                 .maxAge(60L * 60 * 24 * 30)
                 .sameSite("Lax")
                 .build();
@@ -83,9 +83,9 @@ public class AuthController {
 
 
 
-        response.setHeader("Set-Cookie", accessCookie.toString());
-        response.setHeader("Set-Cookie", refreshCookie.toString());
-        response.setHeader("Set-Cookie", authType.toString());
+        response.addHeader("Set-Cookie", accessCookie.toString());
+        response.addHeader("Set-Cookie", refreshCookie.toString());
+        response.addHeader("Set-Cookie", authType.toString());
 
         return ResponseEntity.ok(Map.of("status", "success"));
 
@@ -101,15 +101,15 @@ public class AuthController {
 
 
         ResponseCookie authType = ResponseCookie.from("AUTH_TYPE", "base")
-                .httpOnly(false)
-                .secure(false) // для localhost
+                .httpOnly(true)
+                .secure(false)
                 .path("/")
                 .sameSite("Lax")
                 .build();
 
         ResponseCookie accessCookie = ResponseCookie.from("ACCESS_TOKEN", tokens.get("access"))
-                .httpOnly(false)
-                .secure(false) // для localhost
+                .httpOnly(true)
+                .secure(false)
                 .path("/")
                 .maxAge(60 * 15)
                 .sameSite("Lax")
@@ -117,8 +117,8 @@ public class AuthController {
 
         ResponseCookie refreshCookie = ResponseCookie.from("REFRESH_TOKEN", tokens.get("refresh"))
                 .httpOnly(true)
-                .secure(false) // для localhost
-                .path("/auth")
+                .secure(false)
+                .path("/")
                 .maxAge(60L * 60 * 24 * 30)
                 .sameSite("Lax")
                 .build();
@@ -137,7 +137,7 @@ public class AuthController {
                                                   HttpServletResponse response, OAuth2AuthenticationToken oAuth2AuthenticationToken, ClientRegistration clientRegistration) {
         String registrationId = oAuth2AuthenticationToken.getAuthorizedClientRegistrationId();
 
-        System.out.println(principal.getAttributes());
+
 
 
 
@@ -178,7 +178,7 @@ public class AuthController {
 
 
         ResponseCookie accessCookie = ResponseCookie.from("ACCESS_TOKEN", accessToken)
-                .httpOnly(false)
+                .httpOnly(true)
                 .secure(true)
                 .path("/")
                 .maxAge(60 * 15)
@@ -188,7 +188,7 @@ public class AuthController {
         ResponseCookie refreshCookie = ResponseCookie.from("REFRESH_TOKEN", refreshToken)
                 .httpOnly(true)
                 .secure(true)
-                .path("/auth")
+                .path("/")
                 .maxAge(60L * 60 * 24 * 30)
                 .sameSite("Lax")
                 .build();

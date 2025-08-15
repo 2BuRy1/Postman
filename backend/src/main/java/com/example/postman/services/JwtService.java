@@ -73,6 +73,15 @@ public class JwtService {
 
 
 
+    public boolean validateToken(String token){
+
+        return extractAllClaims(token).getExpiration().before(new Date());
+
+
+    }
+
+
+
     public List<String> getOauthSubjects(String token){
 
 
@@ -91,7 +100,6 @@ public class JwtService {
     public String getBaseSubject(String token){
         return extractAllClaims(token).getSubject();
     }
-
 
 
     private Claims extractAllClaims(String token){

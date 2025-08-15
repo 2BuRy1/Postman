@@ -19,15 +19,16 @@ import org.springframework.web.cors.CorsConfigurationSource;
 @EnableMethodSecurity
 public class HttpSecurityFilter {
 
-    //private final JwtBaseFilter jwtBaseFilter;
+    private final JwtBaseFilter jwtBaseFilter;
 
     private final CorsConfigurationSource corsConfigurationSource;
 
     private final AuthenticationProvider authenticationProvider;
 
     @Autowired
-    public HttpSecurityFilter(CorsConfigurationSource corsConfigurationSource, AuthenticationProvider authenticationProvider) {
-      //  this.jwtBaseFilter = jwtBaseFilter;
+    public HttpSecurityFilter(JwtBaseFilter jwtBaseFilter, CorsConfigurationSource corsConfigurationSource, AuthenticationProvider authenticationProvider) {
+        this.jwtBaseFilter = jwtBaseFilter;
+        //  this.jwtBaseFilter = jwtBaseFilter;
         this.corsConfigurationSource = corsConfigurationSource;
         this.authenticationProvider = authenticationProvider;
     }
@@ -45,8 +46,9 @@ public class HttpSecurityFilter {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/form-login", "/login", "/form-register", "/form-registration").permitAll()
                         .anyRequest().authenticated()
-                ).authenticationProvider(authenticationProvider);
-              //  .addFilterBefore(jwtBaseFilter, UsernamePasswordAuthenticationFilter.class);
+                ).authenticationProvider(authenticationProvider)
+                .addFilterBefore(jwtBaseFilter, UsernamePasswordAuthenticationFilter.class);
+
 
 
 
