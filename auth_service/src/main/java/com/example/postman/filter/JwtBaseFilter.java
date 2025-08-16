@@ -17,7 +17,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -43,11 +42,20 @@ public class JwtBaseFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
+
+        System.out.println("entered in filter");
+
+
         Cookie[] cookies = request.getCookies();
+
+
+
         if (cookies == null) {
             filterChain.doFilter(request, response);
             return;
         }
+
+
 
         Optional<Cookie> authTypeOptional = findCookie(cookies, "AUTH_TYPE");
         Optional<Cookie> accessTokenOptional = findCookie(cookies, "ACCESS_TOKEN");
@@ -58,14 +66,22 @@ public class JwtBaseFilter extends OncePerRequestFilter {
         }
 
         if (accessTokenOptional.isEmpty()) {
+
             filterChain.doFilter(request, response);
             return;
         }
 
+
+
         if (SecurityContextHolder.getContext().getAuthentication() != null) {
+
             filterChain.doFilter(request, response);
             return;
         }
+
+
+        System.out.println("after");
+
 
         try {
             String authType = authTypeOptional.get().getValue();
@@ -85,6 +101,11 @@ public class JwtBaseFilter extends OncePerRequestFilter {
     }
 
     private void handleOAuthAuthentication(Cookie[] cookies, String accessToken, HttpServletResponse response) {
+
+
+        System.out.println("entered in ouath authentication");
+
+
         try {
             Optional<Cookie> refreshTokenOptional = findCookie(cookies, "REFRESH_TOKEN");
 
@@ -92,28 +113,37 @@ public class JwtBaseFilter extends OncePerRequestFilter {
                 return;
             }
 
+
+            System.out.println("refresh cookie is here");
+
             String refreshToken = refreshTokenOptional.get().getValue();
             String validToken = accessToken;
 
             if (!jwtService.validateToken(accessToken)) {
+                System.out.println("invalid");
                 validToken = getTokenFromRefresh(refreshToken, response);
                 if (validToken == null) {
+                    System.out.println("invalid hpw??");
                     return;
                 }
             }
 
             List<String> oauthSubjects = jwtService.getOauthSubjects(validToken);
             if (oauthSubjects.size() < 2) {
+                System.out.println("not many args");
                 return;
             }
 
             Optional<OAuthUser> oAuthUserOptional = oAuthUserRepository.findOAuthUserByProviderIdAndProvider(
                     oauthSubjects.get(0), oauthSubjects.get(1));
 
+            System.out.println("trying to authentocate");
+
+
             if (oAuthUserOptional.isPresent()) {
                 OAuthUser user = oAuthUserOptional.get();
                 Authentication auth = new OAuth2AuthenticationToken(
-                        (OAuth2User) user,
+                        (OAuthUser) user,
                         Arrays.asList(new SimpleGrantedAuthority("ROLE_USER")),
                         user.getProviderId()
                 );
@@ -135,7 +165,7 @@ public class JwtBaseFilter extends OncePerRequestFilter {
             String refreshToken = refreshTokenOptional.get().getValue();
             String validToken = accessToken;
 
-            if (!jwtService.validateToken(accessToken)) {
+            if (jwtService.validateToken(accessToken)) {
                 validToken = getTokenFromRefreshForBasic(refreshToken, response);
                 if (validToken == null) {
                     return;
@@ -171,7 +201,10 @@ public class JwtBaseFilter extends OncePerRequestFilter {
 
     private String getTokenFromRefresh(String refreshToken, HttpServletResponse servletResponse) {
         try {
+            System.out.println("refreshing token");
+
             if (!jwtService.validateToken(refreshToken)) {
+                System.out.println(refreshToken);
                 return null;
             }
 
@@ -200,7 +233,7 @@ public class JwtBaseFilter extends OncePerRequestFilter {
 
     private String getTokenFromRefreshForBasic(String refreshToken, HttpServletResponse servletResponse) {
         try {
-            if (!jwtService.validateToken(refreshToken)) {
+            if (jwtService.validateToken(refreshToken)) {
                 return null;
             }
 

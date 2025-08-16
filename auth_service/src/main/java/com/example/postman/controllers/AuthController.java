@@ -3,6 +3,7 @@ package com.example.postman.controllers;
 import com.example.postman.models.BasicUser;
 import com.example.postman.models.OAuthUser;
 import com.example.postman.repositories.BasicUserRepository;
+import com.example.postman.repositories.OAuthUserRepository;
 import com.example.postman.services.AuthService;
 import com.example.postman.services.JwtService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -31,7 +32,7 @@ import java.util.Map;
 public class AuthController {
 
 
-    private final String frontendUrl = "http://localhost:3001";
+    private final String frontendUrl = "http://localhost:3000";
 
 
     private boolean cookiesSecure = false;
@@ -39,13 +40,16 @@ public class AuthController {
 
     private final AuthService authService;
 
+    private final OAuthUserRepository oAuthUserRepository;
+
 
     private final JwtService jwtService;
 
 
     @Autowired
-    public AuthController(AuthService authService, JwtService jwtService) {
+    public AuthController(AuthService authService, OAuthUserRepository oAuthUserRepository, JwtService jwtService) {
         this.authService = authService;
+        this.oAuthUserRepository = oAuthUserRepository;
         this.jwtService = jwtService;
     }
 
@@ -147,7 +151,7 @@ public class AuthController {
 
             oAuthUser = OAuthUser.builder()
                     .email(principal.getAttribute("email"))
-                    .login(principal.getAttribute("name"))
+                    .name(principal.getAttribute("name"))
                     .provider("google")
                     .providerId(principal.getAttribute("sub"))
                     .avatarUri(principal.getAttribute("picture")).build();
@@ -160,7 +164,7 @@ public class AuthController {
 
              oAuthUser = OAuthUser.builder()
                     .email(principal.getAttribute("email"))
-                    .login(principal.getAttribute("name"))
+                    .name(principal.getAttribute("name"))
                     .provider("github")
                     .providerId(principal.getAttribute("id").toString())
                     .avatarUri(principal.getAttribute("avatar_url")).build();
@@ -178,12 +182,14 @@ public class AuthController {
         String accessToken = jwtService.createAccessTokenForOauth(oAuthUser.getProviderId(), oAuthUser.getProvider());
         String refreshToken = jwtService.createOathRefreshToken(oAuthUser.getProviderId(), oAuthUser.getProvider());
 
+        if(!oAuthUserRepository.existsOAuthUserByProviderIdAndProvider(oAuthUser.getProviderId(), oAuthUser.getProvider())) oAuthUserRepository.save(oAuthUser);
+
 
         ResponseCookie accessCookie = ResponseCookie.from("ACCESS_TOKEN", accessToken)
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
-                .maxAge(60 * 15)
+                .maxAge(60 * 5 )
                 .sameSite("Lax")
                 .build();
 
@@ -203,7 +209,7 @@ public class AuthController {
 
 
         return ResponseEntity.status(302)
-                .location(URI.create(frontendUrl + "/auth-success?authenticated=true"))
+                .location(URI.create(frontendUrl))
                 .build();
     }
 

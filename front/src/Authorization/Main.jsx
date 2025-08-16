@@ -1,26 +1,64 @@
-import {useEffect} from "react";
+import {useEffect, useRef, useState} from "react";
+import {useNavigate} from "react-router";
 
 const Main = () => {
+
+
+    const navigate = useNavigate()
+
+    const [buttonValue, setButtonValue] = useState(0);
+
+
+    function handleClick() {
+
+
+        const data = {
+
+            'method' : 'GET',
+            'credentials': 'include'
+        }
+
+
+        fetch(`http://localhost:8080/button_pizdec?button=${buttonValue}`, data).then((response) => response.json())
+            .then(data => setButtonValue(data.value))
+
+
+
+
+        }
 
     useEffect(() => {
 
 
         const data = {
-            headers: {
-                'Content-Type': 'application/json'
-            },
+
             'method' : 'GET',
             'credentials': 'include',
         }
 
 
 
-        fetch("http://localhost:8080/auth_check", data).then((response) => {
-            console.log(response);
+        fetch("http://localhost:8080/auth_check", data)
+            .then(response => {if(response.ok) {
+            console.log("hgawaed")
+            }
         })
-
-
+            .catch( error => {
+            console.error("pizdec!!");
+            navigate('/login')
+            }
+        )
     })
+
+
+
+
+    return (
+        <div>
+            <button onClick = {handleClick} ></button>
+           {buttonValue}
+        </div>
+    )
 
 
 

@@ -6,7 +6,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
@@ -73,11 +72,25 @@ public class JwtService {
 
 
 
-    public boolean validateToken(String token){
+    public boolean validateToken(String token) {
+        try {
+            Claims claims = Jwts.parser()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getBody();
 
-        return extractAllClaims(token).getExpiration().before(new Date());
+            boolean isExpired = claims.getExpiration().before(new Date());
 
 
+
+            return !isExpired;
+
+        } catch (Exception e) {
+            // Логируем ошибку для отладки
+            System.err.println("Token validation failed: " + e.getMessage());
+            return false;
+        }
     }
 
 
