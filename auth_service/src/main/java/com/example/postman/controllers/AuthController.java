@@ -54,7 +54,7 @@ public class AuthController {
     }
 
 
-    @PostMapping("/form-registration")
+    @PostMapping("/form-register")
     public ResponseEntity<Map<String, String>> register(@RequestBody BasicUser basicUser, HttpServletResponse response) {
 
         System.out.println("priver register");

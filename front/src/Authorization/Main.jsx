@@ -1,5 +1,6 @@
 import {useEffect, useRef, useState} from "react";
 import {useNavigate} from "react-router";
+import ProfileAvatar from "../Profile/ProfileAvatar";
 
 const Main = () => {
 
@@ -40,7 +41,6 @@ const Main = () => {
 
         fetch("http://localhost:8080/auth_check", data)
             .then(response => {if(response.ok) {
-            console.log("hgawaed")
             }
         })
             .catch( error => {
@@ -57,6 +57,7 @@ const Main = () => {
         <div>
             <button onClick = {handleClick} ></button>
            {buttonValue}
+            <ProfileAvatar/>
         </div>
     )
 

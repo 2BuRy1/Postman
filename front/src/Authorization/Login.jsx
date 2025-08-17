@@ -13,22 +13,13 @@ const Login = () => {
 
 
 
-    const location = useLocation();
     useEffect(() => {
-        const queryParams = new URLSearchParams(location.search);
-        const authenticated = queryParams.get('authenticated');
-        console.log("authenticvasadasd");
-        if (authenticated === 'true') {
-            setIsAuthenticated(true);
-        }
-    }, [location]);
-
-
-    useEffect(() => {
-        if (isAuthenticated) {
-            navigate('/');
-        }
-    }, [isAuthenticated, navigate]);
+        fetch("http://localhost:8080/auth_check", {method: "GET", 'credentials': 'include'})
+            .then(response => {
+                if(response.ok) {
+                    navigate("/");
+                }})
+    })
 
 
 
@@ -93,7 +84,6 @@ const Login = () => {
             Or sign in with
         <div className="buttons">
             <AuthButton onClick={(e) => handleRegisterButton(e)}>
-                <GoogleOutlined name = "GoogleOutlined" />
                 <GithubOutlined name = "GithubOutlined" />
             </AuthButton>
         </div>

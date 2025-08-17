@@ -143,8 +143,8 @@ public class JwtBaseFilter extends OncePerRequestFilter {
             if (oAuthUserOptional.isPresent()) {
                 OAuthUser user = oAuthUserOptional.get();
                 Authentication auth = new OAuth2AuthenticationToken(
-                        (OAuthUser) user,
-                        Arrays.asList(new SimpleGrantedAuthority("ROLE_USER")),
+                        user,
+                        user.getAuthorities(),
                         user.getProviderId()
                 );
                 SecurityContextHolder.getContext().setAuthentication(auth);
@@ -165,7 +165,7 @@ public class JwtBaseFilter extends OncePerRequestFilter {
             String refreshToken = refreshTokenOptional.get().getValue();
             String validToken = accessToken;
 
-            if (jwtService.validateToken(accessToken)) {
+            if (!jwtService.validateToken(accessToken)) {
                 validToken = getTokenFromRefreshForBasic(refreshToken, response);
                 if (validToken == null) {
                     return;
@@ -233,7 +233,7 @@ public class JwtBaseFilter extends OncePerRequestFilter {
 
     private String getTokenFromRefreshForBasic(String refreshToken, HttpServletResponse servletResponse) {
         try {
-            if (jwtService.validateToken(refreshToken)) {
+            if (!jwtService.validateToken(refreshToken)) {
                 return null;
             }
 

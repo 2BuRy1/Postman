@@ -8,6 +8,18 @@ import {useNavigate} from "react-router";
 
 const Register = () => {
 
+    const navigate = useNavigate();
+
+
+
+    useEffect(() => {
+        fetch("http://localhost:8080/auth_check", {method: "GET", 'credentials': 'include'})
+            .then(response => {
+                if(response.ok) {
+                navigate("/");
+            }})
+        })
+
 
 
 
@@ -24,10 +36,15 @@ const Register = () => {
         }
 
         fetch('http://localhost:8080/form-register', data)
-            .then(res => res.json()).then((res) => {
-            console.log(res);
-        })
+            .then(res => {
+                if(res.ok) {
+                    navigate('/')
+                }
+            });
     };
+
+
+
     return (
         <div className="login">
             <div className="form-login">
