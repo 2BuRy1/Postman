@@ -1,6 +1,7 @@
 package com.example.postman.filter;
 
 
+import com.example.postman.services.CustomOAuth2UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,12 +27,15 @@ public class HttpSecurityFilter {
 
     private final AuthenticationProvider authenticationProvider;
 
+    private final CustomOAuth2UserService customOAuth2UserService;
+
     @Autowired
-    public HttpSecurityFilter(JwtBaseFilter jwtBaseFilter, CorsConfigurationSource corsConfigurationSource, AuthenticationProvider authenticationProvider) {
+    public HttpSecurityFilter(JwtBaseFilter jwtBaseFilter, CorsConfigurationSource corsConfigurationSource, AuthenticationProvider authenticationProvider, CustomOAuth2UserService customOAuth2UserService) {
         this.jwtBaseFilter = jwtBaseFilter;
         //  this.jwtBaseFilter = jwtBaseFilter;
         this.corsConfigurationSource = corsConfigurationSource;
         this.authenticationProvider = authenticationProvider;
+        this.customOAuth2UserService = customOAuth2UserService;
     }
 
     @Bean
@@ -40,7 +44,8 @@ public class HttpSecurityFilter {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .csrf(AbstractHttpConfigurer::disable)
                 .oauth2Client(Customizer.withDefaults())
-                .oauth2Login(oauth2 -> oauth2.loginPage("http://localhost:3000").defaultSuccessUrl("/auth-success", true))
+                .oauth2Login(oauth2 -> oauth2.loginPage("http://localhost:3000").defaultSuccessUrl("/auth-success", true).userInfoEndpoint(userInfoEndpointConfig ->
+                        userInfoEndpointConfig.userService(customOAuth2UserService)))
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth

@@ -1,32 +1,12 @@
 import {useEffect, useRef, useState} from "react";
 import {useNavigate} from "react-router";
 import ProfileAvatar from "../Profile/ProfileAvatar";
+import '../styles/Main.css';
 
 const Main = () => {
 
 
     const navigate = useNavigate()
-
-    const [buttonValue, setButtonValue] = useState(0);
-
-
-    function handleClick() {
-
-
-        const data = {
-
-            'method' : 'GET',
-            'credentials': 'include'
-        }
-
-
-        fetch(`http://localhost:8080/button_pizdec?button=${buttonValue}`, data).then((response) => response.json())
-            .then(data => setButtonValue(data.value))
-
-
-
-
-        }
 
     useEffect(() => {
 
@@ -54,10 +34,8 @@ const Main = () => {
 
 
     return (
-        <div>
-            <button onClick = {handleClick} ></button>
-           {buttonValue}
-            <ProfileAvatar/>
+        <div id="header">
+           <ProfileAvatar/>
         </div>
     )
 

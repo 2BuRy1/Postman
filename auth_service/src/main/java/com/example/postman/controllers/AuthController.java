@@ -143,41 +143,7 @@ public class AuthController {
 
 
 
-
-
-        OAuthUser oAuthUser = null;
-
-        if (registrationId.equals("google")) {
-
-            oAuthUser = OAuthUser.builder()
-                    .email(principal.getAttribute("email"))
-                    .name(principal.getAttribute("name"))
-                    .provider("google")
-                    .providerId(principal.getAttribute("sub"))
-                    .avatarUri(principal.getAttribute("picture")).build();
-
-            System.out.println(oAuthUser);
-
-
-
-        } else if (registrationId.equals("github")) {
-
-             oAuthUser = OAuthUser.builder()
-                    .email(principal.getAttribute("email"))
-                    .name(principal.getAttribute("name"))
-                    .provider("github")
-                    .providerId(principal.getAttribute("id").toString())
-                    .avatarUri(principal.getAttribute("avatar_url")).build();
-
-            System.out.println(oAuthUser);
-
-        }
-
-
-        else{
-            return (ResponseEntity<Void>) ResponseEntity.badRequest();
-
-        }
+        OAuthUser oAuthUser = (OAuthUser) principal;
 
         String accessToken = jwtService.createAccessTokenForOauth(oAuthUser.getProviderId(), oAuthUser.getProvider());
         String refreshToken = jwtService.createOathRefreshToken(oAuthUser.getProviderId(), oAuthUser.getProvider());
@@ -209,7 +175,7 @@ public class AuthController {
 
 
         return ResponseEntity.status(302)
-                .location(URI.create(frontendUrl))
+                .location(URI.create(frontendUrl + "/login"))
                 .build();
     }
 

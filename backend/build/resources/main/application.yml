@@ -1,0 +1,30 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            client-id: Ov23ligoUAmOLz7enKo7
+            client-secret: dae385e269da0eb34d2d31b99e5247ccd04ab6d4
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            client-name: GitHub
+          scope:
+            - user:email
+            - read:user
+          google:
+            client-id: 667583302608-la8ihtjnm2bfjed40g4q3tf1hs5b923r.apps.googleusercontent.com
+            client-secret: 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
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    password: password
+    name: database
+    username: user
+    url: jdbc:postgresql://localhost:5432/postgres
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+
+jwt:
+  secret: sdasdjmmnasjdhjnmmasdjkhkm,,mnm,nhbhbhjyyuyuiukjjasdbasdhhaikfH123adnd13

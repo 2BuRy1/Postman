@@ -14,13 +14,8 @@ const ProfileAvatar = () => {
 
 
     return   (
+                <Avatar size={64} src={avatar} />
 
-        <Space direction="vertical" size={16}>
-            <Space wrap size={16}>
-                <Avatar size="large" src={avatar} />
-            </Space>
-
-        </Space>
     );
 }
 export default ProfileAvatar;
