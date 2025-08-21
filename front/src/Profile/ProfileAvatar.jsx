@@ -6,11 +6,17 @@ const ProfileAvatar = () => {
 
 
     useEffect(() => {
-        fetch('http://localhost:8080/image', {method: 'GET', 'credentials': 'include'})
-            .then(res => res.json()).then(data => setAvatar(data.image))
+        setTimeout(() => {
+            fetch('http://localhost:8080/image', {method: 'GET', 'credentials': 'include'})
+                .then(res => res.json()).then(data => setAvatar(data.image))
 
 
-    }, [] )
+        }, 1000)
+    }, [])
+
+
+
+
 
 
     return   (

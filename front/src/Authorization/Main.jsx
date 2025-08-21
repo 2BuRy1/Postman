@@ -20,23 +20,28 @@ const Main = () => {
 
 
         fetch("http://localhost:8080/auth_check", data)
-            .then(response => {if(response.ok) {
+            .then(response => {
+                if(response.status === 401) {
+                    fetch("http://localhost:8080/auth", {  'method' : 'GET',
+                        'credentials': 'include',})
             }
         })
-            .catch( error => {
-            console.error("pizdec!!");
-            navigate('/login')
             }
-        )
-    })
+        , [])
 
 
-
+    const on = () => {
+        fetch("http://localhost:8081/test_not", {method: 'GET', credentials: 'include'})
+            .then(res => console.log(res))
+    }
 
     return (
+        <>
         <div id="header">
            <ProfileAvatar/>
         </div>
+        <button onClick={on}/>
+        </>
     )
 
 

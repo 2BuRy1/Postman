@@ -20,6 +20,7 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import javax.security.sasl.AuthenticationException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -42,65 +43,51 @@ public class JwtBaseFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-
-        System.out.println("entered in filter");
-
-
         Cookie[] cookies = request.getCookies();
-
-
-
         if (cookies == null) {
             filterChain.doFilter(request, response);
             return;
         }
 
-
-
         Optional<Cookie> authTypeOptional = findCookie(cookies, "AUTH_TYPE");
         Optional<Cookie> accessTokenOptional = findCookie(cookies, "ACCESS_TOKEN");
 
-        if (authTypeOptional.isEmpty()) {
+        if (authTypeOptional.isEmpty() || accessTokenOptional.isEmpty()) {
             filterChain.doFilter(request, response);
             return;
         }
-
-        if (accessTokenOptional.isEmpty()) {
-
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-
 
         if (SecurityContextHolder.getContext().getAuthentication() != null) {
-
             filterChain.doFilter(request, response);
             return;
         }
 
+        String authType = authTypeOptional.get().getValue();
+        String accessToken = accessTokenOptional.get().getValue();
 
-        System.out.println("after");
+        boolean valid = jwtService.validateToken(accessToken);
 
-
-        try {
-            String authType = authTypeOptional.get().getValue();
-            String accessToken = accessTokenOptional.get().getValue();
-
-            if ("oauth".equals(authType)) {
-                handleOAuthAuthentication(cookies, accessToken, response);
-            } else if ("base".equals(authType)) {
-                handleBasicAuthentication(cookies, accessToken, response);
+        if (!valid) {
+            if ("/auth".equals(request.getRequestURI())) {
+                filterChain.doFilter(request, response);
+            } else {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
             }
-        } catch (Exception e) {
+            return;
+        }
 
-            System.err.println("Authentication error: " + e.getMessage());
+        // Если токен валиден — аутентифицируем пользователя
+        if ("oauth".equals(authType)) {
+            handleOAuthAuthentication(cookies, accessToken, filterChain);
+        } else if ("base".equals(authType)) {
+            handleBasicAuthentication(cookies, accessToken, response);
         }
 
         filterChain.doFilter(request, response);
     }
 
-    private void handleOAuthAuthentication(Cookie[] cookies, String accessToken, HttpServletResponse response) {
+    private void handleOAuthAuthentication(Cookie[] cookies, String accessToken, FilterChain filterChain) {
 
 
         System.out.println("entered in ouath authentication");
@@ -116,17 +103,8 @@ public class JwtBaseFilter extends OncePerRequestFilter {
 
             System.out.println("refresh cookie is here");
 
-            String refreshToken = refreshTokenOptional.get().getValue();
             String validToken = accessToken;
 
-            if (!jwtService.validateToken(accessToken)) {
-                System.out.println("invalid");
-                validToken = getTokenFromRefresh(refreshToken, response);
-                if (validToken == null) {
-                    System.out.println("invalid hpw??");
-                    return;
-                }
-            }
 
             List<String> oauthSubjects = jwtService.getOauthSubjects(validToken);
             if (oauthSubjects.size() < 2) {
@@ -162,15 +140,7 @@ public class JwtBaseFilter extends OncePerRequestFilter {
                 return;
             }
 
-            String refreshToken = refreshTokenOptional.get().getValue();
             String validToken = accessToken;
-
-            if (!jwtService.validateToken(accessToken)) {
-                validToken = getTokenFromRefreshForBasic(refreshToken, response);
-                if (validToken == null) {
-                    return;
-                }
-            }
 
             String username = jwtService.getBaseSubject(validToken);
             if (username == null) {
@@ -199,65 +169,6 @@ public class JwtBaseFilter extends OncePerRequestFilter {
                 .findFirst();
     }
 
-    private String getTokenFromRefresh(String refreshToken, HttpServletResponse servletResponse) {
-        try {
-            System.out.println("refreshing token");
 
-            if (!jwtService.validateToken(refreshToken)) {
-                System.out.println(refreshToken);
-                return null;
-            }
-
-            List<String> oauthSubjects = jwtService.getOauthSubjects(refreshToken);
-            if (oauthSubjects.size() < 2) {
-                return null;
-            }
-
-            String token = jwtService.createAccessTokenForOauth(oauthSubjects.get(0), oauthSubjects.get(1));
-
-            ResponseCookie accessCookie = ResponseCookie.from("ACCESS_TOKEN", token)
-                    .httpOnly(true)
-                    .secure(false)
-                    .path("/")
-                    .maxAge(60 * 15)
-                    .sameSite("Lax")
-                    .build();
-
-            servletResponse.addHeader("Set-Cookie", accessCookie.toString());
-            return token;
-        } catch (Exception e) {
-            System.err.println("Error refreshing OAuth token: " + e.getMessage());
-            return null;
-        }
-    }
-
-    private String getTokenFromRefreshForBasic(String refreshToken, HttpServletResponse servletResponse) {
-        try {
-            if (!jwtService.validateToken(refreshToken)) {
-                return null;
-            }
-
-            String username = jwtService.getBaseSubject(refreshToken);
-            if (username == null) {
-                return null;
-            }
-
-            String token = jwtService.createBaseAccessToken(username);
-
-            ResponseCookie accessCookie = ResponseCookie.from("ACCESS_TOKEN", token)
-                    .httpOnly(true)
-                    .secure(false)
-                    .path("/")
-                    .maxAge(60 * 15)
-                    .sameSite("Lax")
-                    .build();
-
-            servletResponse.addHeader("Set-Cookie", accessCookie.toString());
-            return token;
-        } catch (Exception e) {
-            System.err.println("Error refreshing basic token: " + e.getMessage());
-            return null;
-        }
-    }
 }
 

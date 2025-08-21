@@ -43,6 +43,7 @@ public class HttpSecurityFilter {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .csrf(AbstractHttpConfigurer::disable)
+//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2Client(Customizer.withDefaults())
                 .oauth2Login(oauth2 -> oauth2.loginPage("http://localhost:3000").defaultSuccessUrl("/auth-success", true).userInfoEndpoint(userInfoEndpointConfig ->
                         userInfoEndpointConfig.userService(customOAuth2UserService)))
@@ -50,7 +51,7 @@ public class HttpSecurityFilter {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/form-login", "/login", "/form-register", "/form-registration").permitAll()
+                        .requestMatchers("/form-login", "/login", "/form-register", "/form-registration", "/auth").permitAll()
                         .anyRequest().authenticated()
                 ).authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtBaseFilter, UsernamePasswordAuthenticationFilter.class);

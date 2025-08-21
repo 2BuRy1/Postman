@@ -8,6 +8,7 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.naming.AuthenticationException;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.*;
@@ -87,7 +88,7 @@ public class JwtService {
             return !isExpired;
 
         } catch (Exception e) {
-            // Логируем ошибку для отладки
+
             System.err.println("Token validation failed: " + e.getMessage());
             return false;
         }
