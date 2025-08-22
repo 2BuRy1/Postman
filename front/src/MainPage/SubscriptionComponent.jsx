@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import {useNavigate, useParams} from "react-router";
 import CustomButton from "./CustomButton";
 import '../styles/Subscription.css'
 const SubscriptionComponent = () => {
@@ -8,6 +8,8 @@ const SubscriptionComponent = () => {
     const [publicKey, setPublicKey] = useState("");
     const { id } = useParams();
     const [name, setName] = useState("");
+    const navigate = useNavigate()
+
 
     useEffect(() => {
         navigator.serviceWorker.getRegistration().then((registration) => {
@@ -23,7 +25,12 @@ const SubscriptionComponent = () => {
             .then((res) => res.json())
             .then((data) => setPublicKey(data.key))
             .catch(() => {
-                fetch("http://localhost:8080/auth", { method: "GET", credentials: "include" });
+                fetch("http://localhost:8080/auth", { method: "GET", credentials: "include" })
+                    .then(fetch("http://localhost:8081/get_key", {
+                        method: "GET",
+                        credentials: "include",
+                    }).then((res) => res.json())
+                    .then((data) => setPublicKey(data.key)));
             });
     }, []);
 
@@ -64,7 +71,7 @@ const SubscriptionComponent = () => {
         const subscription = await registration?.pushManager.getSubscription();
         if (subscription) {
             await subscription.unsubscribe();
-                await fetch(`http://localhost:8081/unsubscribe/${id}?name=${name}`, {
+                await fetch(`http://localhost:8081/unsubscribe`, {
                     method: "POST",
                     headers: {"Content-Type": "application/json"},
                     body: JSON.stringify({endpoint: subscription.endpoint}),
@@ -89,7 +96,15 @@ const SubscriptionComponent = () => {
         setName(e.target.value);
     }
 
+    const goHome = () =>{
+        navigate("/")
+    }
+
     return (
+        <>
+            <div className={"header"}>
+                <CustomButton onClick={goHome}text={"Home"} />
+            </div>
         <div className="subscriptionComponent">
             <h1>Web Push Notifications 📣</h1>
             {denied && (
@@ -99,7 +114,7 @@ const SubscriptionComponent = () => {
             )}
 
             {subscribed ? (
-                <div>
+                <div className={"subscriptionContainer"}>
                     <CustomButton onClick={unsubscribe} text="Unsubscribe" className={"subscribeButton"} />
                 </div>
             ) : (
@@ -110,6 +125,7 @@ const SubscriptionComponent = () => {
                 </div>
             )}
         </div>
+        </>
     );
 };
 

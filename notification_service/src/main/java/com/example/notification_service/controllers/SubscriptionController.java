@@ -117,5 +117,12 @@ public class SubscriptionController {
       return ResponseEntity.badRequest().body("no such user");
   }
 
+  @PostMapping("/unsubscribe")
+    public ResponseEntity<String> unsubscribe(@RequestBody Subscription subscription) throws JsonProcessingException {
+        var optional = subscriberRepository.findBySubscriptionJson(mapper.writeValueAsString(subscription));
+      optional.ifPresent(subscriberRepository::delete);
+      return ResponseEntity.ok("deleted");
+  }
+
 
 }

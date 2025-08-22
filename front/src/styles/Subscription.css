@@ -20,10 +20,17 @@
     height: 70%;
 }
 
+
+.header{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
 .subscriptionContainer{
     display: flex;
     flex-direction: column;
-    width: 30%;
+    width: 40%;
     place-items: center;
 
 }

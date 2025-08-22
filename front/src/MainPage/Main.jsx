@@ -50,6 +50,16 @@ const Main = () => {
             })
     }
 
+    const sendNotifications = () => {
+        fetch("http://localhost:8081/get_currentId", {method: "GET", "credentials": "include"})
+            .then(res => res.json())
+            .then(data => {
+                setProducerId(data.id)
+                console.log(data)
+                navigate(`/send/notification/${data.id}`)
+            })
+    }
+
 
 
     return (
@@ -60,6 +70,7 @@ const Main = () => {
 
             <div className={"mainBody"}>
                 <CustomButton onClick={subscribeLink} text={"Subscribe Link"} className={"mainButtons"}/>
+                <CustomButton onClick={sendNotifications} text={"Send Notifications"} className={"mainButtons"}/>
             </div>
 
         </div>

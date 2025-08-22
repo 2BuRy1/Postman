@@ -131,7 +131,6 @@ public class JwtBaseFilter extends OncePerRequestFilter {
 
         Authentication auth = new UsernamePasswordAuthenticationToken(basicUser, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
 
-        System.out.println("authenticated!!!✅");
     SecurityContextHolder.getContext().setAuthentication(auth);
 
     System.out.println(SecurityContextHolder.getContext().getAuthentication());
