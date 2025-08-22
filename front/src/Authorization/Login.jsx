@@ -13,13 +13,7 @@ const Login = () => {
 
 
 
-    useEffect(() => {
-        fetch("http://localhost:8080/auth_check", {method: "GET", 'credentials': 'include'})
-            .then(response => {
-                if(response.ok) {
-                    navigate("/");
-                }})
-    })
+
 
 
 

@@ -5,10 +5,28 @@
 }
 
 
-body{
-    width:100%;
+.mainBody{
+    display: flex;
+    height: auto;
+    width: 100%;
+    justify-content: center;
 }
 
+.mainPage{
+    display: flex;
+    height: 100%;
+    width: 100%;
+    flex-direction: column;
+}
+
+body{
+    width:100%;
+    height: 100%;
+}
+
+.mainButtons{
+    width: 10%;
+}
 
 
 #header{

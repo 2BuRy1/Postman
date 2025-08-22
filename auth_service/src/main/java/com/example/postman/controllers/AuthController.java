@@ -67,6 +67,8 @@ public class AuthController {
 
         Map<String, String> tokens = authService.register(basicUser);
 
+        System.out.println(tokens.get("access"));
+
         ResponseCookie authType = ResponseCookie.from("AUTH_TYPE", "base")
                 .httpOnly(true)
                 .secure(false)
@@ -78,14 +80,14 @@ public class AuthController {
                 .httpOnly(true)
                 .secure(false)
                 .path("/")
-                .maxAge(60 * 15)
+                .maxAge(60 * 5 )
                 .sameSite("Lax")
                 .build();
 
         ResponseCookie refreshCookie = ResponseCookie.from("REFRESH_TOKEN", tokens.get("refresh"))
                 .httpOnly(true)
                 .secure(false)
-                .path("/auth")
+                .path("/")
                 .maxAge(60L * 60 * 24 * 30)
                 .sameSite("Lax")
                 .build();
@@ -121,7 +123,7 @@ public class AuthController {
                 .httpOnly(true)
                 .secure(false)
                 .path("/")
-                .maxAge(60 * 15)
+                .maxAge(60 * 5 )
                 .sameSite("Lax")
                 .build();
 
@@ -159,7 +161,7 @@ public class AuthController {
 
         ResponseCookie accessCookie = ResponseCookie.from("ACCESS_TOKEN", accessToken)
                 .httpOnly(true)
-                .secure(true)
+                .secure(false)
                 .path("/")
                 .maxAge(60 * 5 )
                 .sameSite("Lax")
@@ -167,7 +169,7 @@ public class AuthController {
 
         ResponseCookie refreshCookie = ResponseCookie.from("REFRESH_TOKEN", refreshToken)
                 .httpOnly(true)
-                .secure(true)
+                .secure(false)
                 .path("/")
                 .maxAge(60L * 60 * 24 * 30)
                 .sameSite("Lax")

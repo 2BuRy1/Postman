@@ -48,23 +48,26 @@ public class JwtBaseFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-
         Optional<Cookie> authTypeOptional = findCookie(cookies, "AUTH_TYPE");
         Optional<Cookie> accessTokenOptional = findCookie(cookies, "ACCESS_TOKEN");
+
+
+
 
         if (authTypeOptional.isEmpty() || accessTokenOptional.isEmpty()) {
             filterChain.doFilter(request, response);
             return;
         }
 
+
         if (SecurityContextHolder.getContext().getAuthentication() != null) {
             filterChain.doFilter(request, response);
             return;
         }
 
+
         String authType = authTypeOptional.get().getValue();
         String accessToken = accessTokenOptional.get().getValue();
-
         boolean valid = jwtService.validateToken(accessToken);
 
         if (!valid) {
@@ -77,7 +80,6 @@ public class JwtBaseFilter extends OncePerRequestFilter {
             return;
         }
 
-        // Если токен валиден — аутентифицируем пользователя
         if ("oauth".equals(authType)) {
             handleOAuthAuthentication(cookies, accessToken, filterChain);
         } else if ("base".equals(authType)) {
@@ -134,11 +136,9 @@ public class JwtBaseFilter extends OncePerRequestFilter {
 
     private void handleBasicAuthentication(Cookie[] cookies, String accessToken, HttpServletResponse response) {
         try {
-            Optional<Cookie> refreshTokenOptional = findCookie(cookies, "REFRESH_TOKEN");
 
-            if (refreshTokenOptional.isEmpty()) {
-                return;
-            }
+
+            System.out.println("entered");
 
             String validToken = accessToken;
 
@@ -146,6 +146,8 @@ public class JwtBaseFilter extends OncePerRequestFilter {
             if (username == null) {
                 return;
             }
+
+
 
             Optional<BasicUser> basicUserOptional = basicUserRepository.findBasicUserByUsername(username);
 

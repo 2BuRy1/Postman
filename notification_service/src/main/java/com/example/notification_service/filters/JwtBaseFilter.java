@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Component;
@@ -49,6 +50,8 @@ public class JwtBaseFilter extends OncePerRequestFilter {
         Optional<Cookie> authTypeOptional = findCookie(cookies, "AUTH_TYPE");
 
 
+
+
         if(accessCookieOptional.isEmpty() || authTypeOptional.isEmpty()){
             filterChain.doFilter(request, response);
             return;
@@ -62,6 +65,7 @@ public class JwtBaseFilter extends OncePerRequestFilter {
         }
 
 
+
         String accessToken = accessCookieOptional.get().getValue();
 
 
@@ -73,11 +77,16 @@ public class JwtBaseFilter extends OncePerRequestFilter {
 
         String autType = authTypeOptional.get().getValue();
 
+
+        System.out.println("we are here");
+        System.out.println(autType);
+
+
         if ("oauth".equals(autType)){
             authenticateViaOAuth(accessToken);
 
         }
-        else if("basic".equals(autType)){
+        else if("base".equals(autType)){;
             authenticateViaBasic(accessToken);
         }
 
@@ -114,17 +123,19 @@ public class JwtBaseFilter extends OncePerRequestFilter {
 
     public void authenticateViaBasic(String access){
 
-        System.out.println("via basic");
         String username = jwtService.getBaseSubject(access);
 
 
         BasicUser basicUser = new BasicUser();
         basicUser.setUsername(username);
 
-        Authentication auth = new UsernamePasswordAuthenticationToken(basicUser, null);
+        Authentication auth = new UsernamePasswordAuthenticationToken(basicUser, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
 
+        System.out.println("authenticated!!!✅");
+    SecurityContextHolder.getContext().setAuthentication(auth);
 
-        SecurityContextHolder.getContext().setAuthentication(auth);
+    System.out.println(SecurityContextHolder.getContext().getAuthentication());
+
     }
 
 
