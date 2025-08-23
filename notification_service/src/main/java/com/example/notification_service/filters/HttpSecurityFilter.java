@@ -42,7 +42,8 @@ public class HttpSecurityFilter {
                 ))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
-                        request -> {
+                        request ->
+                        { request.requestMatchers("/test").permitAll();
                             request.anyRequest().authenticated();
 
                         }

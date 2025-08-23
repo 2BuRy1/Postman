@@ -41,7 +41,16 @@ public class JwtBaseFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
+
+
+        if(request.getRequestURI().contains("/test")){
+            filterChain.doFilter(request, response);
+        }
+
+
         Cookie[] cookies = request.getCookies();
+
+
 
 
         Optional<Cookie> accessCookieOptional = findCookie(cookies, "ACCESS_TOKEN");
@@ -78,8 +87,6 @@ public class JwtBaseFilter extends OncePerRequestFilter {
         String autType = authTypeOptional.get().getValue();
 
 
-        System.out.println("we are here");
-        System.out.println(autType);
 
 
         if ("oauth".equals(autType)){
@@ -90,7 +97,6 @@ public class JwtBaseFilter extends OncePerRequestFilter {
             authenticateViaBasic(accessToken);
         }
 
-        System.out.println("missed?");
         filterChain.doFilter(request, response);
 
     }
@@ -105,7 +111,7 @@ public class JwtBaseFilter extends OncePerRequestFilter {
             return;
         }
 
-        System.out.println("via oauth");
+        
         OAuthUser oAuthUser = OAuthUser.builder().
                 providerId(subjects.get(0))
                 .provider(subjects.get(1))
@@ -117,7 +123,6 @@ public class JwtBaseFilter extends OncePerRequestFilter {
 
             SecurityContextHolder.getContext().setAuthentication(token);
 
-        System.out.println(SecurityContextHolder.getContext().getAuthentication());
 
     }
 
@@ -133,7 +138,6 @@ public class JwtBaseFilter extends OncePerRequestFilter {
 
     SecurityContextHolder.getContext().setAuthentication(auth);
 
-    System.out.println(SecurityContextHolder.getContext().getAuthentication());
 
     }
 

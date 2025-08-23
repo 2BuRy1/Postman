@@ -88,3 +88,9 @@
 .send-btn:hover {
     background: #1d4ed8;
 }
+
+
+.errorText{
+    margin-top: 8px;
+    color: red;
+}

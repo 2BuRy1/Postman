@@ -53,12 +53,22 @@ public class JwtBaseFilter extends OncePerRequestFilter {
 
 
 
-
-        if (authTypeOptional.isEmpty() || accessTokenOptional.isEmpty()) {
+        if (authTypeOptional.isEmpty() ) {
             filterChain.doFilter(request, response);
             return;
         }
 
+        if(accessTokenOptional.isEmpty() && findCookie(cookies, "REFRESH_TOKEN").isPresent()){
+            if(jwtService.validateToken(findCookie(cookies, "REFRESH_TOKEN").get().getValue())){
+                if ("/auth".equals(request.getRequestURI())) {
+                    filterChain.doFilter(request, response);
+                } else {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    return;
+                }
+                return;
+            }
+        }
 
         if (SecurityContextHolder.getContext().getAuthentication() != null) {
             filterChain.doFilter(request, response);
@@ -92,7 +102,7 @@ public class JwtBaseFilter extends OncePerRequestFilter {
     private void handleOAuthAuthentication(Cookie[] cookies, String accessToken, FilterChain filterChain) {
 
 
-        System.out.println("entered in ouath authentication");
+        
 
 
         try {
@@ -103,21 +113,21 @@ public class JwtBaseFilter extends OncePerRequestFilter {
             }
 
 
-            System.out.println("refresh cookie is here");
+            
 
             String validToken = accessToken;
 
 
             List<String> oauthSubjects = jwtService.getOauthSubjects(validToken);
             if (oauthSubjects.size() < 2) {
-                System.out.println("not many args");
+                
                 return;
             }
 
             Optional<OAuthUser> oAuthUserOptional = oAuthUserRepository.findOAuthUserByProviderIdAndProvider(
                     oauthSubjects.get(0), oauthSubjects.get(1));
 
-            System.out.println("trying to authentocate");
+            
 
 
             if (oAuthUserOptional.isPresent()) {
@@ -138,7 +148,7 @@ public class JwtBaseFilter extends OncePerRequestFilter {
         try {
 
 
-            System.out.println("entered");
+            
 
             String validToken = accessToken;
 

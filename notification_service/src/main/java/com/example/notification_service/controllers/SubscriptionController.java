@@ -14,6 +14,7 @@ import jdk.jshell.JShell;
 import lombok.Getter;
 import nl.martijndwars.webpush.Subscription;
 import org.apache.coyote.Response;
+import org.jose4j.lang.JoseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -21,10 +22,13 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
 import java.security.Principal;
 import java.security.PrivateKey;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 public class SubscriptionController {
@@ -95,12 +99,21 @@ public class SubscriptionController {
 
    }
 
+
+   @PostMapping("/test")
+   public void test(@RequestBody Subscription subscription) throws JoseException, GeneralSecurityException, IOException, ExecutionException, InterruptedException {
+       System.out.println(subscription);
+       pushService.send(subscription);
+   }
+
   @PostMapping("save-subscription/{id}")
   public ResponseEntity<String> saveSubscription(@RequestBody Subscription subscription,
                                                  @PathVariable("id") String id,
                                                  @RequestParam String name
-                                                 ) throws JsonProcessingException {
+                                                 ) throws IOException, JoseException, GeneralSecurityException, ExecutionException, InterruptedException {
         var optional = producerRepository.findByProviderId(id);
+        pushService.send(subscription);
+
       if (optional.isPresent() && name!=null && !name.isEmpty()) {
           var producer = optional.get();
 
@@ -111,6 +124,8 @@ public class SubscriptionController {
           subscriberRepository.save(subscriber);
 
           System.out.println(subscription.endpoint + " " + id);
+
+
           return ResponseEntity.ok("saved");
 
       }

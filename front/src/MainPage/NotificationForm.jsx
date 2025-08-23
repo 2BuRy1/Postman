@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 import Papa from "papaparse";
 import "../styles/NotificationForm.css";
+import {useParams} from "react-router";
 
-export default function NotificationForm() {
-    const [names, setNames] = useState([""]);
+const NotificationForm = () => {
+    const [names, setNames] = useState([]); // без пустого элемента
     const [message, setMessage] = useState("");
+    const [error, setError] = useState(false);
+    const { id } = useParams();
 
 
     const handleFileUpload = (event) => {
@@ -27,17 +30,39 @@ export default function NotificationForm() {
 
     const handleNameChange = (index, value) => {
         const newNames = [...names];
-        newNames[index] = value;
+        if (value.trim().length === 0) {
+            newNames.splice(index, 1);
+        } else {
+            newNames[index] = value;
+        }
         setNames(newNames);
     };
 
     const handleSubmit = () => {
+        const filteredNames = names.filter((n) => n.trim().length > 0);
+        if(filteredNames.length === 0 || message === ""){
+            setError(true);
+            return;
+        }
 
-        fetch(`http://localhost:8081/notificate`, {method: "POST",
+        fetch(`http://localhost:8081/notificate?id=${id}`, {
+            method: "POST",
             credentials: "include",
-                body: {"names" : names, "message": message}})
-            .then(res => res.json())
-
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ names: filteredNames, message: message }),
+        }).then((res) => res.json())
+            .then((data) => {console.log(data.status)})
+            .catch(error => {
+                fetch(`http://localhost:8080/auth`, {method: "GET", credentials: "include"})
+                    .then(fetch(`http://localhost:8081/notificate?id=${id}`, {
+                        method: "POST",
+                        credentials: "include",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ names: filteredNames, message: message }),
+                    }).then((res) => res.json())
+                        .then((data) => {console.log(data.status)}))
+            });
+        setError(false)
     };
 
     return (
@@ -80,6 +105,12 @@ export default function NotificationForm() {
             <button onClick={handleSubmit} className="send-btn">
                 Отправить уведомление
             </button>
+
+            {
+                error ? (<p className={"errorText"}>Enter data, please</p>) : (null)
+            }
         </div>
     );
-}
+};
+
+export default NotificationForm;

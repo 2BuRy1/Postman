@@ -1,5 +1,6 @@
 package com.example.notification_service.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -17,5 +18,6 @@ public class NotificationSubscriber {
 
     @ManyToOne
     @JoinColumn(name = "producer_id", nullable = false)
+    @JsonIgnore
     private NotificationProducer producer;
 }
